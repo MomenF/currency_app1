@@ -14,7 +14,8 @@ class EndPoints {
 // static const  = '';
 
   /// part 2 => 11 to 20
-// static const  = '';
+static const register = 'auth/jwt/create/';
+static const login = 'auth/users/';
 // static const  = '';
 // static const  = '';
 // static const  = '';

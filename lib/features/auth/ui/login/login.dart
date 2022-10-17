@@ -9,6 +9,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../theme/lang.dart';
+import '../../data/model/sign_model.dart';
+import '../../data/web_services/auth.dart';
+import '../../data/web_services/entity/my_custom_response_entity.dart';
 
 
 
@@ -49,44 +52,46 @@ class LoginPage extends  GetView<LoginController> {
       ),
     );;
   }
-}
-
-
-
-  Widget _loginButton({required void Function()? onPressed}) {
+  Widget _loginButtonDis() {
     return Container(
         margin: const EdgeInsets.symmetric(horizontal: 18.0),
         height: 45.0,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: ColorManger.primary,
+          color: ColorManger.primary2,
           borderRadius: BorderRadius.circular(8.0),
         ),
         child: MaterialButton(
-          onPressed:onPressed,
-          child: Text(
-            Lang.LOGIN,
-            style: TextModelStyle.blackColor14BoldStyle(),
+          onPressed:() async {
+            MyCustomResponseEntity status = await AuthCore.signIn(SignInModel(email:  controller.emailController.text.trim(),
+            password: controller.passwordController.text
+            ));
+            switch(status.success){
+              case true:
+                Get.showSnackbar(GetSnackBar(
+                  duration: Duration(seconds: 2),
+
+                  backgroundColor: ColorManger.primary,
+                  titleText:Text("Congratulation") ,
+                  messageText: Text("Register is completed successfully") ,
+                ));
+                break;
+              case false:
+                Get.showSnackbar(GetSnackBar(
+                  duration: Duration(seconds: 2),
+                  backgroundColor: ColorManger.primary,
+                  titleText:Text("Error Occured") ,
+                  messageText: Text("${status.errorCode}") ,
+                ));
+                break;
+            }
+            Get.toNamed(Routes.layout);
+          },
+          child: const CircularProgressIndicator(
+            color: ColorManger.primary,
           ),
         ));
   }
-
-Widget _loginButtonDis() {
-  return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 18.0),
-      height: 45.0,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: ColorManger.primary2,
-        borderRadius: BorderRadius.circular(8.0),
-      ),
-      child: MaterialButton(
-        onPressed:(){},
-        child: const CircularProgressIndicator(
-          color: ColorManger.primary,
-        ),
-      ));
-}
 
   Widget _signUpBack() {
     return Row(
@@ -153,8 +158,8 @@ Widget _loginButtonDis() {
           style: TextModelStyle.greyColor314BoldStyle(),
         ),
         CustomInput(
-            controller: emailController,
-             validator: validator,
+          controller: emailController,
+          validator: validator,
         ),
         const SizedBox(
           height: 12.0,
@@ -163,19 +168,14 @@ Widget _loginButtonDis() {
           Lang.PASSWORD,
           style: TextModelStyle.greyColor314BoldStyle(),
         ),
-         PasswordInput(
-           controller: passwordController,
-           validator: validator,
-         ),
+        PasswordInput(
+          controller: passwordController,
+          validator: validator,
+        ),
         _forgetPassword()
       ],
     );
   }
-
-
-
-
-
 
   Widget _forgetPassword() {
     return Row(
@@ -189,5 +189,29 @@ Widget _loginButtonDis() {
             )),
       ],
     );
+  }
+  Widget _loginButton({required void Function()? onPressed}) {
+    return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 18.0),
+        height: 45.0,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: ColorManger.primary,
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        child: MaterialButton(
+          onPressed:onPressed,
+          child: Text(
+            Lang.LOGIN,
+            style: TextModelStyle.blackColor14BoldStyle(),
+          ),
+        ));
+  }
+
 }
+
+
+
+
+
 

@@ -10,6 +10,8 @@ import '../../../../theme/paths/routes.dart';
 import '../../data/model/register_model.dart';
 import '../../data/web_services/auth.dart';
 import 'package:get/get.dart';
+
+import '../../data/web_services/entity/my_custom_response_entity.dart';
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
 
@@ -26,7 +28,6 @@ class _SignUpPageState extends State<SignUpPage> {
   TextEditingController phoneController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController rePasswordController = TextEditingController();
-  AuthServices authServices = AuthServices();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -151,26 +152,35 @@ class _SignUpPageState extends State<SignUpPage> {
         child: MaterialButton(
           onPressed: () async {
             //Navigator.pushNamed(context, Routes.verificationPage);
-            authStatus status =  await  authServices.postRegisterUserApi(RegisterModel(
-              firstName:nameController.text,
-               lastName: nameController.text,
-               email: emailController.text.trim(),
-               phone: phoneController.text.trim(),
-               password: passwordController.text,
-               rePassword: rePasswordController.text
-            ));
-          switch(status){
-            case authStatus.success:
+            MyCustomResponseEntity status = await AuthCore.signUp( RegisterModel(
+                firstName:nameController.text,
+                lastName: nameController.text,
+                email: emailController.text.trim(),
+                phone: phoneController.text.trim(),
+                password: passwordController.text,
+                rePassword: rePasswordController.text
+            ) );
+
+          switch(status.success){
+            case true:
             Get.showSnackbar(GetSnackBar(
+              duration: Duration(seconds: 2),
             backgroundColor: ColorManger.primary,
               titleText:Text("Congratulation") ,
               messageText: Text("Register is completed successfully") ,
             ));
               break;
-            case authStatus.field:
-              // TODO: Handle this case.
+            case false:
+              Get.showSnackbar(GetSnackBar(
+                duration: Duration(seconds: 2),
+                backgroundColor: ColorManger.primary,
+                titleText:Text("Error Occured") ,
+                messageText: Text("${status.errorCode}") ,
+              ));
               break;
           }
+            Get.toNamed(Routes.layout);
+
           },
           child: Text(
             "اشتراك",
